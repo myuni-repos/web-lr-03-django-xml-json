@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'grades/css/style.css' %}">
+    <title>Успеваемость студентов</title>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="{% url 'index' %}">Добавить запись</a>
+            <a href="#">Список файлов</a>
+            <a href="#">Загрузить файл</a>
+        </div>
+
+        <h2>Ввод успеваемости</h2>
+        
+        {% if message %}
+            <div class="success">{{ message }}</div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Сохранить</button>
+        </form>
+    </div>
+</body>
+</html>

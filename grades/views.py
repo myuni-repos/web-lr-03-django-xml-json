@@ -1,3 +1,23 @@
 from django.shortcuts import render
+from .forms import GradeForm
+from .utils import save_grade_to_file
 
-# Create your views here.
+def index(request):
+    message = ''
+    
+    if request.method == 'POST':
+        form = GradeForm(request.POST)
+        
+        if form.is_valid():
+            save_grade_to_file(form.cleaned_data)
+            message = 'Данные успешно сохранены в файл!'
+            form = GradeForm()
+    else:
+        form = GradeForm()
+        
+    context = {
+        'form': form,
+        'message': message
+    }
+    
+    return render(request, 'grades/index.html', context)
