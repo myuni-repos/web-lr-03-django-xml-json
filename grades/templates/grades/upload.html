@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'grades/css/upload.css'%}">
+    <title>Загрузка файла</title>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="{% url 'index' %}">Добавить запись</a>
+            <a href="{% url 'file_list' %}">Список файлов</a>
+            <a href="{% url 'upload_file' %}">Загрузить файл</a>
+        </div>
+
+        <h2>Загрузка готового файла</h2>
+        <p>Вы можете загрузить .json или .xml файл с данными успеваемости.</p>
+        
+        {% if message %}
+            <div class="msg {% if is_error %}error{% else %}success{% endif %}">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Загрузить и проверить</button>
+        </form>
+    </div>
+</body>
+</html>

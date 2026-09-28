@@ -1,6 +1,8 @@
+import os
 import json
 import xml.etree.ElementTree as ET
 import uuid
+from pathlib import Path
 from django.conf import settings
 
 STORAGE_DIR = settings.BASE_DIR / 'storage'
@@ -65,3 +67,45 @@ def get_all_grades():
                 pass
                 
     return grades
+
+def process_uploaded_file(uploaded_file):
+    """
+    Сохраняет загруженный файл с безопасным именем, проверяет его структуру,
+    и удаляет, если он невалиден. Возвращает (Успех(bool), Сообщение(str)).
+    """
+    ext = Path(uploaded_file.name).suffix.lower()
+    
+    if ext not in ['.json', '.xml']:
+        return False, "Недопустимый формат файла. Разрешены только .json и .xml"
+
+    unique_filename = f"uploaded_{uuid.uuid4().hex}{ext}"
+    file_path = STORAGE_DIR / unique_filename
+
+    STORAGE_DIR.mkdir(exist_ok=True)
+
+    with open(file_path, 'wb+') as destination:
+        for chunk in uploaded_file.chunks():
+            destination.write(chunk)
+    try:
+        if ext == '.json':
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                
+            required_keys = {'student_name', 'group', 'subject', 'grade', 'date'}
+            if not required_keys.issubset(data.keys()):
+                raise ValueError("В JSON отсутствуют обязательные поля успеваемости.")
+                
+        elif ext == '.xml':
+            tree = ET.parse(file_path)
+            root = tree.getroot()
+            
+            required_tags = ['student_name', 'group', 'subject', 'grade', 'date']
+            for tag in required_tags:
+                if root.find(tag) is None:
+                    raise ValueError(f"В XML отсутствует обязательный тег <{tag}>.")
+                    
+    except Exception as e:
+        os.remove(file_path)
+        return False, f"Файл не валиден и был удален. Причина: {e}"
+
+    return True, f"Файл успешно загружен и проверен. Сохранен как {unique_filename}"
