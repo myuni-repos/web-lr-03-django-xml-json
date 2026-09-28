@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'grades/css/file_list.css'%}">
+    <title>Список файлов</title>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="{% url 'index' %}">Добавить запись</a>
+            <a href="{% url 'file_list' %}">Список файлов</a>
+            <a href="#">Загрузить файл</a>
+        </div>
+
+        <h2>Данные из файлов на сервере</h2>
+        
+        {% if message %}
+            <div class="warning">{{ message }}</div>
+        {% else %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Имя файла</th>
+                        <th>Студент</th>
+                        <th>Группа</th>
+                        <th>Предмет</th>
+                        <th>Оценка</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in grades %}
+                    <tr>
+                        <td><small>{{ item.filename }}</small></td>
+                        <td>{{ item.student_name }}</td>
+                        <td>{{ item.group }}</td>
+                        <td>{{ item.subject }}</td>
+                        <td>{{ item.grade }}</td>
+                        <td>{{ item.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</body>
+</html>
